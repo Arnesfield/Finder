@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Finder.iml" filepath="$PROJECT_DIR$/Finder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Finder.iml" filepath="$PROJECT_DIR$/Finder.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/mytoolslib/mytoolslib.iml" filepath="$PROJECT_DIR$/mytoolslib/mytoolslib.iml" />
     </modules>

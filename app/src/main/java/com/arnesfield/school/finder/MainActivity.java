@@ -16,11 +16,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
+import com.arnesfield.school.finder.tasks.FetchLocationTask;
+import com.arnesfield.school.mytoolslib.DialogCreator;
 import com.arnesfield.school.mytoolslib.SnackBarCreator;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,7 +31,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity
+        implements OnMapReadyCallback, FetchLocationTask.OnPostExecuteListener, DialogCreator.DialogActionListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean isMapReady;
     private Location currLocation;
     private boolean wasPressed;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // get extras
+        int uid = getIntent().getIntExtra("uid", -1);
+        boolean showMessage = getIntent().getBooleanExtra("show_message", false);
+
         // references
+        rootView = findViewById(R.id.main_root_view);
+        if (showMessage) {
+            SnackBarCreator.set(R.string.snackbar_success_login);
+            SnackBarCreator.show(rootView);
+        }
+
         fab = (FloatingActionButton) findViewById(R.id.main_fab);
 
         isMapReady = false;
@@ -71,8 +85,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onProviderDisabled(String provider) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
+                DialogCreator.create(MainActivity.this, "request")
+                        .setTitle(R.string.dialog_request_title)
+                        .setMessage(R.string.dialog_request_msg)
+                        .setPositiveButton(R.string.dialog_request_positive)
+                        .show();
             }
         };
 
@@ -97,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0, locationListener);
                 }
                 else {
-                    SnackBarCreator.set("Could not request for location updates.");
+                    SnackBarCreator.set(R.string.snackbar_permission_denied);
                     SnackBarCreator.show(view);
                 }
 
@@ -178,6 +195,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
+    private void triggerLogout() {
+        DialogCreator.create(this, "logout")
+                .setTitle(R.string.dialog_logout_title)
+                .setMessage(R.string.dialog_logout_msg)
+                .setPositiveButton(R.string.dialog_logout_positive)
+                .setNegativeButton(R.string.dialog_logout_negative)
+                .show();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            triggerLogout();
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -214,10 +248,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                triggerLogout();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -229,5 +263,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // set on ready
         isMapReady = true;
+    }
+
+    // fetch location listener
+    @Override
+    public void parseJSONString(String jsonString) {
+
+    }
+
+    // dialog action listener
+    @Override
+    public void onClickPositiveButton(String actionId) {
+        Intent intent;
+        switch (actionId) {
+            case "logout":
+                intent = new Intent(this, LoginActivity.class);
+                intent.putExtra("logout", 1);
+                startActivity(intent);
+                finish();
+                break;
+
+            case "request":
+                intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+                break;
+        }
+    }
+
+    @Override
+    public void onClickNegativeButton(String actionId) {
+
+    }
+
+    @Override
+    public void onClickNeutralButton(String actionId) {
+
+    }
+
+    @Override
+    public void onClickMultiChoiceItem(String actionId, int which, boolean isChecked) {
+
+    }
+
+    @Override
+    public void onCreateDialogView(String actionId, View view) {
+
     }
 }

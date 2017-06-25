@@ -1,5 +1,30 @@
 <resources>
     <string name="app_name">Finder</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_maps">Map</string>
+
+    <string name="action_logout">Logout</string>
+
+    <string name="title_activity_maps">Finder</string>
+    <string name="title_activity_login">Login</string>
+
+    <string name="lbl_username">Username</string>
+    <string name="lbl_password">Password</string>
+    <string name="lbl_login">Login</string>
+
+    <string name="dialog_request_title">Access Location</string>
+    <string name="dialog_request_msg">Turn on your location settings to be able to use the app.</string>
+    <string name="dialog_request_positive">Go to Settings</string>
+
+    <string name="dialog_logout_title">Logout</string>
+    <string name="dialog_logout_msg">You will be logged out. Continue logout?</string>
+    <string name="dialog_logout_positive">Logout</string>
+    <string name="dialog_logout_negative">Cancel</string>
+
+    <string name="snackbar_permission_denied">Could not request for location updates.</string>
+
+    <string name="snackbar_success_login">Logged in successfully.</string>
+    <string name="snackbar_success_logout">Logged out successfully.</string>
+
+    <string name="snackbar_fail_login">Invalid username or password.</string>
+    <string name="snackbar_fail_empty_username">Username cannot be blank.</string>
+    <string name="snackbar_fail_empty_password">Password cannot be blank.</string>
 </resources>

@@ -22,13 +22,20 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.arnesfield.school.mytoolslib.SnackBarCreator;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private GoogleMap mMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private FloatingActionButton fab;
     private TextView tvSamp;
+    private boolean isMapReady;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +48,15 @@ public class MainActivity extends AppCompatActivity {
         fab = (FloatingActionButton) findViewById(R.id.main_fab);
         tvSamp = (TextView) findViewById(R.id.main_tv_samp);
 
+        isMapReady = false;
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 tvSamp.append("\n" + location.getLatitude() + " " + location.getLongitude());
+
+                // when location updates
+                whenLocationChanges(location);
             }
 
             @Override
@@ -65,7 +76,12 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
+        // check if has permission
         if (!checkForRuntimePermissions())
             whenPermissionIsSet();
     }
@@ -90,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     private boolean checkForRuntimePermissions() {
@@ -107,6 +122,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    private void whenLocationChanges(Location currLocation) {
+        if (!isMapReady)
+            return;
+
+        // Add a marker
+        double latitude = currLocation.getLatitude();
+        double longitude = currLocation.getLongitude();
+
+        LatLng latLng = new LatLng(latitude, longitude);
+        // mMap.addMarker(new MarkerOptions().position(latLng).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
     }
 
     @Override
@@ -152,5 +180,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // set on ready
+        isMapReady = true;
     }
 }

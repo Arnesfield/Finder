@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.arnesfield.school.mytoolslib.SnackBarCreator;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -22,8 +24,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                SnackBarCreator.set("Test Action");
+                SnackBarCreator.show(view);
             }
         });
     }

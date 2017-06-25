@@ -11,13 +11,19 @@
     <string name="lbl_login">Login</string>
 
     <string name="dialog_request_title">Access Location</string>
-    <string name="dialog_request_msg">Turn on your location settings to be able to use the app.</string>
+    <string name="dialog_request_msg">Turn on your location settings to be able to get location data.</string>
     <string name="dialog_request_positive">Go to Settings</string>
 
     <string name="dialog_logout_title">Logout</string>
     <string name="dialog_logout_msg">You will be logged out. Continue logout?</string>
     <string name="dialog_logout_positive">Logout</string>
     <string name="dialog_logout_negative">Cancel</string>
+
+    <string name="progress_login_title">Logging In</string>
+    <string name="progress_login_msg">Loading login information...</string>
+
+    <string name="progress_fetch_location_title">Loading</string>
+    <string name="progress_fetch_location_msg">Loading location data...</string>
 
     <string name="snackbar_permission_denied">Could not request for location updates.</string>
 

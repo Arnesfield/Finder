@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.arnesfield.school.finder.R;
 import com.arnesfield.school.finder.config.TaskConfig;
 
 import java.io.BufferedInputStream;
@@ -61,8 +62,8 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog.setTitle("Loading");
-        progressDialog.setMessage("Loading location data...");
+        progressDialog.setTitle(R.string.progress_fetch_location_title);
+        progressDialog.setMessage(context.getResources().getString(R.string.progress_fetch_location_title));
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(true);
         progressDialog.show();

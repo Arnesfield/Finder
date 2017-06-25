@@ -108,21 +108,25 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (arePermissionsAllowed()) {
-                    // SnackBarCreator.set("Requestion for location updates.");
-                    // change provider
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0, locationListener);
-                }
-                else {
-                    SnackBarCreator.set(R.string.snackbar_permission_denied);
-                    SnackBarCreator.show(view);
-                }
-
-                // go to current location saved
-                whenLocationChanges(null, true);
+                gotoCurrentLocation();
             }
         });
 
+    }
+
+    private void gotoCurrentLocation() {
+        if (arePermissionsAllowed()) {
+            // SnackBarCreator.set("Requestion for location updates.");
+            // change provider
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0, locationListener);
+        }
+        else {
+            SnackBarCreator.set(R.string.snackbar_permission_denied);
+            SnackBarCreator.show(rootView);
+        }
+
+        // go to current location saved
+        whenLocationChanges(null, true);
     }
 
     private boolean checkForRuntimePermissions() {
@@ -263,6 +267,8 @@ public class MainActivity extends AppCompatActivity
 
         // set on ready
         isMapReady = true;
+
+        gotoCurrentLocation();
     }
 
     // fetch location listener

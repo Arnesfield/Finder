@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.arnesfield.school.finder.R;
 import com.arnesfield.school.finder.config.TaskConfig;
 
 import java.io.BufferedInputStream;
@@ -88,8 +89,8 @@ public final class LoginUserTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog.setTitle("Logging In");
-        progressDialog.setMessage("Loading login information...");
+        progressDialog.setTitle(R.string.progress_login_title);
+        progressDialog.setMessage(context.getResources().getString(R.string.progress_login_msg));
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(true);
         progressDialog.show();

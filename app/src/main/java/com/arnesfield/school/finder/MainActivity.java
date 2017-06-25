@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FloatingActionButton fab;
     private TextView tvSamp;
     private boolean isMapReady;
+    private Location currLocation;
+    private boolean wasPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         tvSamp = (TextView) findViewById(R.id.main_tv_samp);
 
         isMapReady = false;
+        wasPressed = false;
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 tvSamp.append("\n" + location.getLatitude() + " " + location.getLongitude());
 
                 // when location updates
-                whenLocationChanges(location);
+                whenLocationChanges(location, wasPressed);
             }
 
             @Override
@@ -91,18 +95,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SnackBarCreator.set("Test Action");
-
-                if (
-                    ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    SnackBarCreator.set("Set");
+                if (arePermissionsAllowed()) {
+                    // SnackBarCreator.set("Requestion for location updates.");
                     // change provider
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0, locationListener);
                 }
+                else {
+                    SnackBarCreator.set("Could not request for location updates.");
+                    SnackBarCreator.show(view);
+                }
 
-                SnackBarCreator.show(view);
+                // go to current location saved
+                whenLocationChanges(null, true);
             }
         });
 
@@ -114,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(this, new String[] {
+            ActivityCompat.requestPermissions(this, new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             }, 1);
@@ -124,17 +128,58 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return false;
     }
 
-    private void whenLocationChanges(Location currLocation) {
+    private boolean arePermissionsAllowed() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void whenLocationChanges(Location currLocation, boolean isPressed) {
         if (!isMapReady)
             return;
+
+        // only go to current position when fab is pressed
+        wasPressed = isPressed;
+
+        // if param location is null, set to instance current location
+        if (currLocation == null)
+            currLocation = this.currLocation;
+
+        // param location is passed to instance current location
+        this.currLocation = currLocation;
+
+        // if param location is still null
+        // or if fab was not pressed
+        if (currLocation == null || !wasPressed)
+            return;
+
+        wasPressed = false;
 
         // Add a marker
         double latitude = currLocation.getLatitude();
         double longitude = currLocation.getLongitude();
 
-        LatLng latLng = new LatLng(latitude, longitude);
-        // mMap.addMarker(new MarkerOptions().position(latLng).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        LatLng coordinates = new LatLng(latitude, longitude);
+
+        // enable
+        if (arePermissionsAllowed()) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMapToolbarEnabled(false);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        }
+
+        // add marker to current position
+        // mMap.addMarker(new MarkerOptions().position(coordinates).title("Current Location"));
+        // mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates));
+
+        // animate to position
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(coordinates)
+                .zoom(17)
+                // .bearing(0)
+                // .tilt(30)
+                .build();
+
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override

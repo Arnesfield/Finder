@@ -2,12 +2,14 @@ package com.arnesfield.school.finder;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -17,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.arnesfield.school.mytoolslib.SnackBarCreator;
 
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private FloatingActionButton fab;
+    private TextView tvSamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +39,13 @@ public class MainActivity extends AppCompatActivity {
 
         // references
         fab = (FloatingActionButton) findViewById(R.id.main_fab);
+        tvSamp = (TextView) findViewById(R.id.main_tv_samp);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-
+                tvSamp.append("\n" + location.getLatitude() + " " + location.getLongitude());
             }
 
             @Override
@@ -55,11 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onProviderDisabled(String provider) {
-
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
             }
         };
-
-
 
 
         if (!checkForRuntimePermissions())
@@ -72,9 +76,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 SnackBarCreator.set("Test Action");
+
+                if (
+                    ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    SnackBarCreator.set("Set");
+                    // change provider
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0, locationListener);
+                }
+
                 SnackBarCreator.show(view);
             }
         });
+
+
     }
 
     private boolean checkForRuntimePermissions() {
@@ -91,6 +107,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // remove
+        if (locationManager != null) {
+            locationManager.removeUpdates(locationListener);
+        }
     }
 
     @Override

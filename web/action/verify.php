@@ -1,5 +1,8 @@
 <?php
 
+if (!isset($_GET['c']))
+  return;
+
 require_once('db-connection.php');
 
 $code = $_GET['c'];

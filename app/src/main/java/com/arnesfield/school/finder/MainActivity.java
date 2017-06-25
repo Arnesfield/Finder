@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationManager locationManager;
     private LocationListener locationListener;
     private FloatingActionButton fab;
-    private TextView tvSamp;
     private boolean isMapReady;
     private Location currLocation;
     private boolean wasPressed;
@@ -49,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // references
         fab = (FloatingActionButton) findViewById(R.id.main_fab);
-        tvSamp = (TextView) findViewById(R.id.main_tv_samp);
 
         isMapReady = false;
         wasPressed = false;
@@ -57,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                tvSamp.append("\n" + location.getLatitude() + " " + location.getLongitude());
-
                 // when location updates
                 whenLocationChanges(location, wasPressed);
             }

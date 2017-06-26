@@ -9,8 +9,11 @@ if (isset($_POST['login'])) {
   $chk_username = mysqli_real_escape_string($conn, $username);
 
   $query = "
-    SELECT id, password FROM users
-    WHERE username = '$chk_username'
+    SELECT id, password, status
+    FROM users
+    WHERE
+      username = '$chk_username' AND
+      status != '0'
   ";
 
   $record = $conn->query($query);
@@ -25,11 +28,18 @@ if (isset($_POST['login'])) {
 
     // verify password
     $hashed_password = $row['password'];
-    $verified = password_verify($password, $hashed_password);
+    $is_password_match = password_verify($password, $hashed_password);
 
     // if verified
-    if ($verified) {
-      $json_object['login'] = $row['id'];
+    if ($is_password_match) {
+      // if account not verified
+      if ($row['status'] == '2') {
+        $json_object['login'] = -1;
+      }
+      // logged in
+      else {
+        $json_object['login'] = $row['id'];
+      }
     }
     // if not
     else {

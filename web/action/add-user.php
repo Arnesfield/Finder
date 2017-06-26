@@ -2,8 +2,6 @@
 if (isset($_POST['signup'])) {
   require_once('header.php');
   require_once('db-connection.php');
-
-  // clear session first
   
   $username = input_filter($_POST['username']);
   $password = input_filter($_POST['password']);

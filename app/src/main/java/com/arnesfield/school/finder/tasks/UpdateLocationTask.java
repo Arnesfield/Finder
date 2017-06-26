@@ -18,9 +18,9 @@ import java.net.URL;
  * Created by User on 06/26.
  */
 
-public final class AddLocationTask extends AsyncTask<Void, Void, Integer> {
+public final class UpdateLocationTask extends AsyncTask<Void, Void, Integer> {
     public static void execute(Context context) {
-        new AddLocationTask(context).execute();
+        new UpdateLocationTask(context).execute();
     }
 
     public interface OnUpdateLocationListener {
@@ -29,14 +29,14 @@ public final class AddLocationTask extends AsyncTask<Void, Void, Integer> {
 
     private final Context context;
 
-    public AddLocationTask(Context context) {
+    public UpdateLocationTask(Context context) {
         this.context = context;
     }
 
     @Override
     protected Integer doInBackground(Void... params) {
         try {
-            URL url = new URL(TaskConfig.ADD_LOCATION_URL);
+            URL url = new URL(TaskConfig.UPDATE_LOCATION_URL);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
             httpURLConnection.setRequestMethod("POST");

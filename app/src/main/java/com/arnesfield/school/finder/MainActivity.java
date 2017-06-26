@@ -17,14 +17,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.arnesfield.school.finder.tasks.AddLocationTask;
+import com.arnesfield.school.finder.tasks.UpdateLocationTask;
 import com.arnesfield.school.finder.tasks.FetchLocationTask;
 import com.arnesfield.school.mytoolslib.DialogCreator;
 import com.arnesfield.school.mytoolslib.RequestStringCreator;
@@ -45,7 +43,7 @@ import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, FetchLocationTask.OnPostExecuteListener,
-        DialogCreator.DialogActionListener, AddLocationTask.OnUpdateLocationListener {
+        DialogCreator.DialogActionListener, UpdateLocationTask.OnUpdateLocationListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
@@ -82,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements
         if (showMessage) {
             SnackBarCreator.set(R.string.snackbar_success_login);
             SnackBarCreator.show(rootView);
+
+            // remove message
+            getIntent().putExtra("show_message", false);
         }
 
         fab = (FloatingActionButton) findViewById(R.id.main_fab);
@@ -178,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements
             return;
 
         // add current location
-        AddLocationTask.execute(this);
+        UpdateLocationTask.execute(this);
 
         // only go to current position when fab is pressed
         wasPressed = isPressed;
@@ -201,7 +202,6 @@ public class MainActivity extends AppCompatActivity implements
                         .position(u.getLatLng())
                 );
             }
-
         }
 
         // if param location is still null
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements
 
         wasPressed = false;
 
-        // Add a my current location
+        // Add my current location
         double latitude = currLocation.getLatitude();
         double longitude = currLocation.getLongitude();
 

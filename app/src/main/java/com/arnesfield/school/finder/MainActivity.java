@@ -1,6 +1,7 @@
 package com.arnesfield.school.finder;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,8 +22,10 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.arnesfield.school.finder.tasks.AddLocationTask;
 import com.arnesfield.school.finder.tasks.FetchLocationTask;
 import com.arnesfield.school.mytoolslib.DialogCreator;
+import com.arnesfield.school.mytoolslib.RequestStringCreator;
 import com.arnesfield.school.mytoolslib.SnackBarCreator;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,8 +34,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity
-        implements OnMapReadyCallback, FetchLocationTask.OnPostExecuteListener, DialogCreator.DialogActionListener {
+import java.io.UnsupportedEncodingException;
+
+public class MainActivity extends AppCompatActivity implements
+        OnMapReadyCallback, FetchLocationTask.OnPostExecuteListener,
+        DialogCreator.DialogActionListener, AddLocationTask.OnUpdateLocationListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
@@ -42,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private Location currLocation;
     private boolean wasPressed;
     private View rootView;
+    private int uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +58,16 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // get extras
-        int uid = getIntent().getIntExtra("uid", -1);
+        uid = getIntent().getIntExtra("uid", -1);
+
+        // handle if no uid
+        if (uid == -1) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         boolean showMessage = getIntent().getBooleanExtra("show_message", false);
 
         // references
@@ -153,6 +169,8 @@ public class MainActivity extends AppCompatActivity
     private void whenLocationChanges(Location currLocation, boolean isPressed) {
         if (!isMapReady)
             return;
+
+        AddLocationTask.execute(this);
 
         // only go to current position when fab is pressed
         wasPressed = isPressed;
@@ -314,5 +332,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onCreateDialogView(String actionId, View view) {
 
+    }
+
+    // add location task listener
+    @Override
+    public String createLocationPostString(ContentValues contentValues) throws UnsupportedEncodingException {
+        if (currLocation == null)
+            return null;
+
+        double latitude = currLocation.getLatitude();
+        double longitude = currLocation.getLongitude();
+
+        contentValues.put("uid", uid);
+        contentValues.put("location", true);
+        contentValues.put("latitude", latitude);
+        contentValues.put("longitude", longitude);
+
+        return RequestStringCreator.create(contentValues);
     }
 }

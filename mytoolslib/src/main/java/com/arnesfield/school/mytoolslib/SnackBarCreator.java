@@ -1,7 +1,9 @@
 package com.arnesfield.school.mytoolslib;
 
+import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * Created by User on 06/07.
@@ -14,6 +16,7 @@ public final class SnackBarCreator {
     public static void set(String message) {
         SnackBarCreator.message = message;
     }
+
     public static void set(int resId) {
         SnackBarCreator.resId = resId;
     }
@@ -28,5 +31,13 @@ public final class SnackBarCreator {
         } catch (Exception e) {}
         message = null;
         resId = -1;
+    }
+
+    public static void toast(Context context, String text) {
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void toast(Context context, int resId) {
+        Toast.makeText(context, resId, Toast.LENGTH_SHORT).show();
     }
 }

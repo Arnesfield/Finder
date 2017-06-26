@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.arnesfield.school.finder.tasks.LoginUserTask;
+import com.arnesfield.school.mytoolslib.RequestStringCreator;
 import com.arnesfield.school.mytoolslib.SnackBarCreator;
 
 import org.json.JSONArray;
@@ -29,7 +30,6 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
-    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,6 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
         setSupportActionBar(toolbar);
 
         // references
-        rootView = findViewById(R.id.login_root_view);
         etUsername = (EditText) findViewById(R.id.login_et_username);
         etPassword = (EditText) findViewById(R.id.login_et_password);
         btnLogin = (Button) findViewById(R.id.login_btn_login);
@@ -65,8 +64,7 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
             editor.apply();
 
             // show message
-            SnackBarCreator.set(R.string.snackbar_success_logout);
-            SnackBarCreator.show(rootView);
+            SnackBarCreator.toast(this, R.string.snackbar_success_logout);
         }
 
         if (loginId != -1 && loggedOut == -1) {
@@ -92,8 +90,7 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
 
             // invalid login
             if (id == 0) {
-                SnackBarCreator.set(R.string.snackbar_fail_login);
-                SnackBarCreator.show(rootView);
+                SnackBarCreator.toast(this, R.string.snackbar_fail_login);
                 return;
             }
 
@@ -116,14 +113,12 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
         String password = etPassword.getText().toString();
 
         if (username.isEmpty() || username.matches("[\\s]+")) {
-            SnackBarCreator.set(R.string.snackbar_fail_empty_username);
-            SnackBarCreator.show(rootView);
+            SnackBarCreator.toast(this, R.string.snackbar_fail_empty_username);
             return null;
         }
 
         if (password.isEmpty() || password.matches("[\\s]+")) {
-            SnackBarCreator.set(R.string.snackbar_fail_empty_password);
-            SnackBarCreator.show(rootView);
+            SnackBarCreator.toast(this, R.string.snackbar_fail_empty_password);
             return null;
         }
 
@@ -131,17 +126,6 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
         contentValues.put("username", username);
         contentValues.put("password", password);
 
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean flag = true;
-
-        for (Map.Entry<String, Object> value : contentValues.valueSet()) {
-            stringBuilder.append( flag ? "" : "&" );
-            flag = false;
-            stringBuilder.append(URLEncoder.encode(value.getKey(), "UTF-8"));
-            stringBuilder.append("=");
-            stringBuilder.append(URLEncoder.encode(value.getValue().toString(), "UTF-8"));
-        }
-
-        return stringBuilder.toString();
+        return RequestStringCreator.create(contentValues);
     }
 }

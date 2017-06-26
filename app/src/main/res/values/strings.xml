@@ -30,7 +30,8 @@
     <string name="snackbar_success_login">Logged in successfully.</string>
     <string name="snackbar_success_logout">Logged out successfully.</string>
 
-    <string name="snackbar_fail_login">Invalid username or password.</string>
+    <string name="snackbar_fail_login_invalid">Invalid username or password.</string>
+    <string name="snackbar_fail_login_unverified">Please verify your account first.</string>
     <string name="snackbar_fail_empty_username">Username cannot be blank.</string>
     <string name="snackbar_fail_empty_password">Password cannot be blank.</string>
 </resources>

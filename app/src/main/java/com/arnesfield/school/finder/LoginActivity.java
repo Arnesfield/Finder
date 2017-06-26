@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,12 +14,9 @@ import com.arnesfield.school.finder.tasks.LoginUserTask;
 import com.arnesfield.school.mytoolslib.RequestStringCreator;
 import com.arnesfield.school.mytoolslib.SnackBarCreator;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements LoginUserTask.LoginListener {
 
@@ -30,6 +26,7 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +37,7 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
         setSupportActionBar(toolbar);
 
         // references
+        rootView = findViewById(R.id.login_root_view);
         etUsername = (EditText) findViewById(R.id.login_et_username);
         etPassword = (EditText) findViewById(R.id.login_et_password);
         btnLogin = (Button) findViewById(R.id.login_btn_login);
@@ -64,7 +62,8 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
             editor.apply();
 
             // show message
-            SnackBarCreator.toast(this, R.string.snackbar_success_logout);
+            SnackBarCreator.set(R.string.snackbar_success_logout);
+            SnackBarCreator.show(rootView);
         }
 
         if (loginId != -1 && loggedOut == -1) {
@@ -90,7 +89,13 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
 
             // invalid login
             if (id == 0) {
-                SnackBarCreator.toast(this, R.string.snackbar_fail_login);
+                SnackBarCreator.set(R.string.snackbar_fail_login_invalid);
+                SnackBarCreator.show(rootView);
+                return;
+            }
+            else if (id == -1) {
+                SnackBarCreator.set(R.string.snackbar_fail_login_unverified);
+                SnackBarCreator.show(rootView);
                 return;
             }
 
@@ -102,8 +107,6 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
 
             // successful
             successfulLogin(id, true);
-
-            // setListView();
         } catch (Exception ignored) {}
     }
 
@@ -113,12 +116,14 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
         String password = etPassword.getText().toString();
 
         if (username.isEmpty() || username.matches("[\\s]+")) {
-            SnackBarCreator.toast(this, R.string.snackbar_fail_empty_username);
+            SnackBarCreator.set(R.string.snackbar_fail_empty_username);
+            SnackBarCreator.show(rootView);
             return null;
         }
 
         if (password.isEmpty() || password.matches("[\\s]+")) {
-            SnackBarCreator.toast(this, R.string.snackbar_fail_empty_password);
+            SnackBarCreator.set(R.string.snackbar_fail_empty_password);
+            SnackBarCreator.show(rootView);
             return null;
         }
 

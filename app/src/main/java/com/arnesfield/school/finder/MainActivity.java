@@ -17,10 +17,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.arnesfield.school.finder.tasks.AddLocationTask;
 import com.arnesfield.school.finder.tasks.FetchLocationTask;
@@ -33,6 +35,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
@@ -170,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements
         if (!isMapReady)
             return;
 
+        // add current location
         AddLocationTask.execute(this);
 
         // only go to current position when fab is pressed
@@ -182,6 +190,20 @@ public class MainActivity extends AppCompatActivity implements
         // param location is passed to instance current location
         this.currLocation = currLocation;
 
+        // add markers based from list of users
+        if (!UserLocation.isListEmpty()) {
+            // remove all markers first
+            mMap.clear();
+            for (UserLocation u : UserLocation.getCopyOfList()) {
+                // add all markers
+                mMap.addMarker(new MarkerOptions()
+                        .title(u.getUsername())
+                        .position(u.getLatLng())
+                );
+            }
+
+        }
+
         // if param location is still null
         // or if fab was not pressed
         if (currLocation == null || !wasPressed)
@@ -189,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements
 
         wasPressed = false;
 
-        // Add a marker
+        // Add a my current location
         double latitude = currLocation.getLatitude();
         double longitude = currLocation.getLongitude();
 
@@ -215,6 +237,9 @@ public class MainActivity extends AppCompatActivity implements
                 .build();
 
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        // fetch locations
+        FetchLocationTask.execute(this);
     }
 
     private void triggerLogout() {
@@ -292,7 +317,34 @@ public class MainActivity extends AppCompatActivity implements
     // fetch location listener
     @Override
     public void parseJSONString(String jsonString) {
+        // clears list to avoid duplicates
+        UserLocation.clearList();
 
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray jsonArray = jsonObject.getJSONArray("locations");
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                jsonObject = jsonArray.getJSONObject(i);
+
+                String username = jsonObject.getString("username");
+                double latitude = jsonObject.getDouble("latitude");
+                double longitude = jsonObject.getDouble("longitude");
+
+                String dateTime = jsonObject.getString("date_time");
+
+                // add user locations to list
+                UserLocation.addLocation(username, latitude, longitude, dateTime);
+            }
+        } catch (JSONException ignored) {}
+    }
+
+    @Override
+    public String createUserIdPostString(ContentValues contentValues) throws UnsupportedEncodingException {
+        int id = uid;
+        contentValues.put("uid", id);
+        contentValues.put("fetch", true);
+        return RequestStringCreator.create(contentValues);
     }
 
     // dialog action listener

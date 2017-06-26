@@ -1,6 +1,7 @@
 package com.arnesfield.school.finder.tasks;
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 
@@ -8,9 +9,14 @@ import com.arnesfield.school.finder.R;
 import com.arnesfield.school.finder.config.TaskConfig;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -26,14 +32,13 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
 
     public interface OnPostExecuteListener {
         void parseJSONString(String jsonString);
+        String createUserIdPostString(ContentValues contentValues) throws UnsupportedEncodingException;
     }
 
     private final Context context;
-    private final ProgressDialog progressDialog;
 
     private FetchLocationTask(Context context) {
         this.context = context;
-        progressDialog = new ProgressDialog(context);
     }
 
     @Override
@@ -41,6 +46,22 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
         try {
             URL url = new URL(TaskConfig.FETCH_URL);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setDoInput(true);
+            httpURLConnection.setDoOutput(true);
+
+            OutputStream outputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+
+            String postString = ((OnPostExecuteListener)context).createUserIdPostString(new ContentValues());
+            bufferedWriter.write(postString);
+
+            // clear
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            outputStream.close();
+
             InputStream inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder stringBuilder = new StringBuilder();
@@ -49,8 +70,10 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
             while ((line = bufferedReader.readLine()) != null)
                 stringBuilder.append(line);
 
+            // clear
             bufferedReader.close();
             inputStream.close();
+
             httpURLConnection.disconnect();
 
             return stringBuilder.toString();
@@ -62,17 +85,11 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog.setTitle(R.string.progress_fetch_location_title);
-        progressDialog.setMessage(context.getResources().getString(R.string.progress_fetch_location_title));
-        progressDialog.setIndeterminate(false);
-        progressDialog.setCancelable(true);
-        progressDialog.show();
     }
 
     @Override
     protected void onPostExecute(String jsonString) {
         super.onPostExecute(jsonString);
-        progressDialog.dismiss();
         ((OnPostExecuteListener)context).parseJSONString(jsonString);
     }
 }

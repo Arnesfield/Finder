@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.arnesfield.school.finder.tasks.LogoutUserTask;
 import com.arnesfield.school.finder.tasks.UpdateLocationTask;
 import com.arnesfield.school.finder.tasks.FetchLocationTask;
 import com.arnesfield.school.mytoolslib.DialogCreator;
@@ -43,7 +44,8 @@ import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, FetchLocationTask.OnPostExecuteListener,
-        DialogCreator.DialogActionListener, UpdateLocationTask.OnUpdateLocationListener {
+        DialogCreator.DialogActionListener, UpdateLocationTask.OnUpdateLocationListener,
+        LogoutUserTask.OnLogoutListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
@@ -267,6 +269,9 @@ public class MainActivity extends AppCompatActivity implements
         if (locationManager != null) {
             locationManager.removeUpdates(locationListener);
         }
+
+        // logout task
+        LogoutUserTask.execute(this);
     }
 
     @Override
@@ -341,8 +346,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public String createUserIdPostString(ContentValues contentValues) throws UnsupportedEncodingException {
-        int id = uid;
-        contentValues.put("uid", id);
+        contentValues.put("uid", uid);
         contentValues.put("fetch", true);
         return RequestStringCreator.create(contentValues);
     }
@@ -400,6 +404,14 @@ public class MainActivity extends AppCompatActivity implements
         contentValues.put("latitude", latitude);
         contentValues.put("longitude", longitude);
 
+        return RequestStringCreator.create(contentValues);
+    }
+
+    // logout listener
+    @Override
+    public String createLogoutPostString(ContentValues contentValues) throws UnsupportedEncodingException {
+        contentValues.put("uid", uid);
+        contentValues.put("logout", true);
         return RequestStringCreator.create(contentValues);
     }
 }

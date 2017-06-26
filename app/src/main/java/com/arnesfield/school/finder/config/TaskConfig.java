@@ -12,4 +12,5 @@ public final class TaskConfig {
     public static final String UPDATE_LOCATION_URL = HTTP_HOST + DIR_ACTION_URL + "update-location.php";
     public static final String ADD_USER_URL = HTTP_HOST + DIR_ACTION_URL + "add-user.php";
     public static final String LOGIN_URL = HTTP_HOST + DIR_ACTION_URL + "login.php";
+    public static final String LOGOUT_URL = HTTP_HOST + DIR_ACTION_URL + "logout.php";
 }

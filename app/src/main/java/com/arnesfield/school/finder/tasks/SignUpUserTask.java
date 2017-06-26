@@ -24,21 +24,21 @@ import java.net.URL;
  * Created by User on 06/25.
  */
 
-public final class LoginUserTask extends AsyncTask<Void, Void, String> {
+public final class SignUpUserTask extends AsyncTask<Void, Void, String> {
 
     public static void execute(Context context) {
-        new LoginUserTask(context).execute();
+        new SignUpUserTask(context).execute();
     }
 
-    public interface OnLoginListener {
+    public interface OnSignUpListener {
         void parseJSONString(String jsonString);
-        String createLoginPostString(ContentValues contentValues) throws UnsupportedEncodingException;
+        String createSignUpPostString(ContentValues contentValues) throws UnsupportedEncodingException;
     }
 
     private final Context context;
     private final ProgressDialog progressDialog;
 
-    public LoginUserTask(Context context) {
+    public SignUpUserTask(Context context) {
         this.context = context;
         progressDialog = new ProgressDialog(context);
     }
@@ -47,7 +47,7 @@ public final class LoginUserTask extends AsyncTask<Void, Void, String> {
     protected String doInBackground(Void... params) {
         try {
             // set form information
-            URL url = new URL(TaskConfig.LOGIN_URL);
+            URL url = new URL(TaskConfig.ADD_USER_URL);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
             httpURLConnection.setRequestMethod("POST");
@@ -57,7 +57,7 @@ public final class LoginUserTask extends AsyncTask<Void, Void, String> {
             OutputStream outputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
 
-            String postString = ((OnLoginListener)context).createLoginPostString(new ContentValues());
+            String postString = ((OnSignUpListener)context).createSignUpPostString(new ContentValues());
             bufferedWriter.write(postString);
 
             // clear
@@ -88,8 +88,8 @@ public final class LoginUserTask extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog.setTitle(R.string.progress_login_title);
-        progressDialog.setMessage(context.getResources().getString(R.string.progress_login_msg));
+        progressDialog.setTitle(R.string.progress_signup_title);
+        progressDialog.setMessage(context.getResources().getString(R.string.progress_signup_msg));
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(true);
         progressDialog.show();
@@ -100,6 +100,6 @@ public final class LoginUserTask extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String jsonString) {
         super.onPostExecute(jsonString);
         progressDialog.dismiss();
-        ((OnLoginListener)context).parseJSONString(jsonString);
+        ((OnSignUpListener)context).parseJSONString(jsonString);
     }
 }

@@ -193,10 +193,11 @@ public class MainActivity extends AppCompatActivity implements
         // param location is passed to instance current location
         this.currLocation = currLocation;
 
+        // remove all markers first
+        mMap.clear();
+
         // add markers based from list of users
         if (!UserLocation.isListEmpty()) {
-            // remove all markers first
-            mMap.clear();
             for (UserLocation u : UserLocation.getCopyOfList()) {
                 // add all markers
                 mMap.addMarker(new MarkerOptions()

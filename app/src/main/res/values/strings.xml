@@ -5,10 +5,16 @@
 
     <string name="title_activity_maps">Finder</string>
     <string name="title_activity_login">Login</string>
+    <string name="title_activity_sign_up">Sign Up</string>
 
     <string name="lbl_username">Username</string>
     <string name="lbl_password">Password</string>
+    <string name="lbl_confirm_password">Confirm Password</string>
     <string name="lbl_login">Login</string>
+    <string name="lbl_email">Email</string>
+    <string name="lbl_signup">Sign Up</string>
+    <string name="lbl_create_account">Create Account?</string>
+    <string name="lbl_forgot_password">Forgot password?</string>
 
     <string name="dialog_request_title">Access Location</string>
     <string name="dialog_request_msg">Turn on your location settings to be able to get location data.</string>
@@ -22,6 +28,9 @@
     <string name="progress_login_title">Logging In</string>
     <string name="progress_login_msg">Loading login information...</string>
 
+    <string name="progress_signup_title">Signing Up</string>
+    <string name="progress_signup_msg">Creating your account...</string>
+
     <string name="progress_fetch_location_title">Loading</string>
     <string name="progress_fetch_location_msg">Loading location data...</string>
 
@@ -30,8 +39,20 @@
     <string name="snackbar_success_login">Logged in successfully.</string>
     <string name="snackbar_success_logout">Logged out successfully.</string>
 
+    <string name="snackbar_success_signup">Account created successfully.</string>
+    <string name="snackbar_success_signup_verify_msg">An email has been sent to verify your account.</string>
+
     <string name="snackbar_fail_login_invalid">Invalid username or password.</string>
     <string name="snackbar_fail_login_unverified">Please verify your account first.</string>
+
+    <string name="snackbar_fail_empty_field">Field cannot be blank.</string>
     <string name="snackbar_fail_empty_username">Username cannot be blank.</string>
     <string name="snackbar_fail_empty_password">Password cannot be blank.</string>
+
+    <string name="snackbar_fail_password_mismatch">Passwords do not match.</string>
+    <string name="snackbar_fail_email_invalid">Invalid email.</string>
+
+    <string name="snackbar_fail_signup_unable">Unable to create your account.</string>
+    <string name="snackbar_fail_signup_duplicate_username">Username already taken.</string>
+    <string name="snackbar_fail_signup_duplicate_email">Email is already being used.</string>
 </resources>

@@ -7,11 +7,10 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.arnesfield.school.finder.tasks.LoginUserTask;
 import com.arnesfield.school.mytoolslib.RequestStringCreator;
@@ -21,7 +20,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
-public class LoginActivity extends AppCompatActivity implements LoginUserTask.LoginListener {
+public class LoginActivity extends AppCompatActivity implements LoginUserTask.OnLoginListener {
 
     private static final String LOGIN_PREF = "login_pref";
     private static final String LOGIN_ID = "login_id";
@@ -29,6 +28,8 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
+    private TextView tvCreateAccount;
+    private TextView tvForgotPassword;
     private View rootView;
     private TextInputLayout tilUsername;
     private TextInputLayout tilPassword;
@@ -53,7 +54,26 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
 
         etUsername = (EditText) findViewById(R.id.login_et_username);
         etPassword = (EditText) findViewById(R.id.login_et_password);
+
+        tvCreateAccount = (TextView) findViewById(R.id.tv_create_account);
+        tvForgotPassword = (TextView) findViewById(R.id.tv_forgot_password);
+
         btnLogin = (Button) findViewById(R.id.login_btn_login);
+
+        tvCreateAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        tvForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override

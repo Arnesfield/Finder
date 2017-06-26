@@ -8,13 +8,17 @@ if (isset($_POST['location']) && isset($_POST['uid'])) {
   $longitude = input_filter($_POST['longitude']);
 
   $sql = "
-    INSERT INTO locations(
-      user_id, latitude, longitude, date_time
-    ) VALUES(?, ?, ?, CONCAT(CURRENT_DATE(), ' ', CURRENT_TIME()));
+    UPDATE locations
+    SET
+      latitude = ?,
+      longitude = ?,
+      status = '1',
+      date_time = CONCAT(CURRENT_DATE(), ' ', CURRENT_TIME())
+    WHERE user_id = ?
   ";
 
   $stmt = $conn->prepare($sql);
-  $stmt->bind_param('idd', $uid, $latitude, $longitude);
+  $stmt->bind_param('ddi', $latitude, $longitude, $uid);
   $stmt->execute();
   $stmt->close();
 

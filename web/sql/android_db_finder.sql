@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 25, 2017 at 03:15 PM
+-- Generation Time: Jun 26, 2017 at 01:16 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 7.1.1
 
@@ -31,30 +31,19 @@ CREATE TABLE `locations` (
   `user_id` int(24) NOT NULL,
   `latitude` double NOT NULL,
   `longitude` double NOT NULL,
-  `date_time` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-CREATE TABLE `users` (
-  `id` int(24) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `verification_code` varchar(255) NOT NULL,
-  `status` enum('0','1','2') NOT NULL
+  `date_time` datetime NOT NULL,
+  `status` enum('0','1') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `users`
+-- Dumping data for table `locations`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `verification_code`, `status`) VALUES
-(1, 'rylee', '$2y$10$5WueUm1sDDb.H7Z.ONh.Cul2zWwLLc8enbgrqyPfFLlBKvz1yOoEq', 'some@email.com', '5313793cc1118227da303e9a9fd75f4e', '1');
+INSERT INTO `locations` (`id`, `user_id`, `latitude`, `longitude`, `date_time`, `status`) VALUES
+(1, 1, 0, 0, '0000-00-00 00:00:00', '0'),
+(2, 2, 0, 0, '0000-00-00 00:00:00', '0'),
+(3, 3, 0, 0, '0000-00-00 00:00:00', '0'),
+(4, 4, 0, 0, '0000-00-00 00:00:00', '0');
 
 --
 -- Indexes for dumped tables
@@ -64,15 +53,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `email`, `verification_code`,
 -- Indexes for table `locations`
 --
 ALTER TABLE `locations`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `id` (`id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `id` (`id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -82,12 +63,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `locations`
 --
 ALTER TABLE `locations`
-  MODIFY `id` int(24) NOT NULL AUTO_INCREMENT;
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(24) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(24) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

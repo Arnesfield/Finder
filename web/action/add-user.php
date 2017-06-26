@@ -48,7 +48,22 @@ if (isset($_POST['signup'])) {
     // close statement
     $stmt->close();
 
-    echo 'Success';
+    // query user
+    $query = "SELECT id FROM users WHERE username = '$username'";
+    $uid = $conn->query($query)->fetch_assoc()['id'];
+
+    // insert in location
+    $sql = "
+      INSERT INTO locations(
+        user_id, latitude, longitude, date_time
+      ) VALUES(?, 0, 0, CONCAT(CURRENT_DATE(), ' ', CURRENT_TIME()));
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $uid);
+    $stmt->execute();
+    $stmt->close();
+
+    $json_object['signup'] = 1;
     // redirect to index
     // header('location: ./');
   }
@@ -70,9 +85,10 @@ if (isset($_POST['signup'])) {
       setcookie('msg_duplicate_email', 1, time()+60, '/');
     */
 
-    echo 'An error occured.';
+    $json_object['signup'] = 0;
   }
-  
+
+  echo json_encode($json_object);
   // close connection
   $conn->close();
 }

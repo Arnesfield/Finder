@@ -10,15 +10,13 @@ if (isset($_POST['fetch']) && isset($_POST['uid'])) {
       u.username AS 'username',
       l.latitude AS 'latitude',
       l.longitude AS 'longitude',
-      MAX(l.date_time) AS 'date_time'
-  FROM
+      l.date_time AS 'date_time'
+    FROM
       users u, locations l
     WHERE
       u.id = l.user_id AND
-      u.id != $uid
-    GROUP BY u.id
-    ORDER BY
-      date_time DESC
+      u.id != $uid AND
+      l.status = '1'
   ";
 
   $result = $conn->query($sql);

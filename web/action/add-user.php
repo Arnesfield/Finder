@@ -43,29 +43,35 @@ if (isset($_POST['signup'])) {
     // send verification code
     require_once('send-verification.php');
     
-    $stmt->execute();
-    
-    // close statement
-    $stmt->close();
+    // if not sent
+    if(!$mail->Send()) {
+      // set error
+      $json_object['signup'] = 0;
+    }
+    // if sent
+    else {
+      $stmt->execute();
+      
+      // close statement
+      $stmt->close();
 
-    // query user
-    $query = "SELECT id FROM users WHERE username = '$username'";
-    $uid = $conn->query($query)->fetch_assoc()['id'];
+      // query user
+      $query = "SELECT id FROM users WHERE username = '$username'";
+      $uid = $conn->query($query)->fetch_assoc()['id'];
 
-    // insert in location
-    $sql = "
-      INSERT INTO locations(
-        user_id, latitude, longitude, date_time
-      ) VALUES(?, 0, 0, CONCAT(CURRENT_DATE(), ' ', CURRENT_TIME()));
-    ";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('i', $uid);
-    $stmt->execute();
-    $stmt->close();
+      // insert in location
+      $sql = "
+        INSERT INTO locations(
+          user_id, latitude, longitude, date_time
+        ) VALUES(?, 0, 0, CONCAT(CURRENT_DATE(), ' ', CURRENT_TIME()));
+      ";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param('i', $uid);
+      $stmt->execute();
+      $stmt->close();
 
-    $json_object['signup'] = 1;
-    // redirect to index
-    // header('location: ./');
+      $json_object['signup'] = 1;
+    }
   }
   // check if username is taken
   else {
@@ -85,7 +91,24 @@ if (isset($_POST['signup'])) {
       setcookie('msg_duplicate_email', 1, time()+60, '/');
     */
 
-    $json_object['signup'] = 0;
+    $query = "
+      SELECT email FROM users
+      WHERE email = '$chk_email'
+    ";
+    
+    $no_of_users = $conn->query($query)->num_rows;
+    if ($no_of_users == 1)
+      $json_object['signup'] = -2;
+
+    $query = "
+      SELECT username FROM users
+      WHERE username = '$chk_username'
+    ";
+    
+    $no_of_users = $conn->query($query)->num_rows;
+    if ($no_of_users == 1)
+      $json_object['signup'] = -1;
+
   }
 
   echo json_encode($json_object);

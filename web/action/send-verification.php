@@ -1,11 +1,12 @@
 <?php
-$host_name = 'http://localhost/sites/school/android/finder/web/';
+// $host_name = 'http://192.168.1.10/sites/school/android/finder/web/';
+$host_name = 'http://arnesfield.pe.hu/android/';
 $verify_dir = 'action/verify.php';
 
 $link = $host_name . $verify_dir . '?c=' . $verification_code;
 
 // change here
-$name = "Finder";
+$name = "Finder Team";
 
 // Gmail username to be use as sender(make sure that the gmail settings was ON or enable)
 $emailUsername = "jfespiritu@fit.edu.ph";
@@ -39,11 +40,7 @@ $mail->Body = "Click this to activate your account: <a href='$link'>$link</a>";
 // Recepient of email: to send whatever email you want to
 $mail->AddAddress($email);
 
-if($mail->Send()) {
-  // set message
-} else {
-  // set error message
-}
+// mail moved to add user
 
 // redirect
 // header("location: ./");

@@ -57,6 +57,6 @@ $result = $conn->query($sql) or die($conn->error);
 // setcookie('msg_account_verified', 1, time()+60, '/');
 
 // header("location: ./");
-echo 'Success';
+echo 'Account successfully verified. You may now login.';
 
 ?>

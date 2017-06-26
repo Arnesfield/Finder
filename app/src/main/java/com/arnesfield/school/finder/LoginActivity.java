@@ -4,11 +4,14 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.arnesfield.school.finder.tasks.LoginUserTask;
 import com.arnesfield.school.mytoolslib.RequestStringCreator;
@@ -27,6 +30,12 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
     private EditText etPassword;
     private Button btnLogin;
     private View rootView;
+    private TextInputLayout tilUsername;
+    private TextInputLayout tilPassword;
+    private boolean errorEmptyUsername;
+    private boolean errorEmptyPassword;
+    private boolean errorInvalidLogin;
+    private boolean errorVerificationRequired;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +47,10 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
 
         // references
         rootView = findViewById(R.id.login_root_view);
+
+        tilUsername = (TextInputLayout) findViewById(R.id.login_username_container);
+        tilPassword = (TextInputLayout) findViewById(R.id.login_password_container);
+
         etUsername = (EditText) findViewById(R.id.login_et_username);
         etPassword = (EditText) findViewById(R.id.login_et_password);
         btnLogin = (Button) findViewById(R.id.login_btn_login);
@@ -88,49 +101,58 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.Lo
             int id = jsonObject.getInt("login");
 
             // invalid login
-            if (id == 0) {
-                SnackBarCreator.set(R.string.snackbar_fail_login_invalid);
-                SnackBarCreator.show(rootView);
-                return;
-            }
-            else if (id == -1) {
-                SnackBarCreator.set(R.string.snackbar_fail_login_unverified);
-                SnackBarCreator.show(rootView);
-                return;
-            }
+            errorInvalidLogin = id == 0;
+            errorVerificationRequired = id == -1;
 
-            // save id to sharedpref
-            SharedPreferences sharedPreferences = getSharedPreferences(LOGIN_PREF, MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt(LOGIN_ID, id);
-            editor.apply();
+            if (!(errorInvalidLogin || errorVerificationRequired)) {
+                // save id to sharedpref
+                SharedPreferences sharedPreferences = getSharedPreferences(LOGIN_PREF, MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt(LOGIN_ID, id);
+                editor.apply();
 
-            // successful
-            successfulLogin(id, true);
+                // successful
+                setErrorFields();
+                successfulLogin(id, true);
+            }
         } catch (Exception ignored) {}
+
+        setErrorFields();
     }
 
     @Override
     public String createLoginPostString(ContentValues contentValues) throws UnsupportedEncodingException {
-        String username = etUsername.getText().toString();
-        String password = etPassword.getText().toString();
+        String username = etUsername.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
 
-        if (username.isEmpty() || username.matches("[\\s]+")) {
-            SnackBarCreator.set(R.string.snackbar_fail_empty_username);
-            SnackBarCreator.show(rootView);
-            return null;
-        }
+        errorEmptyUsername = username.isEmpty();
+        errorEmptyPassword = password.isEmpty();
 
-        if (password.isEmpty() || password.matches("[\\s]+")) {
-            SnackBarCreator.set(R.string.snackbar_fail_empty_password);
-            SnackBarCreator.show(rootView);
+        if (errorEmptyUsername || errorEmptyPassword)
             return null;
-        }
 
         contentValues.put("login", true);
         contentValues.put("username", username);
         contentValues.put("password", password);
 
         return RequestStringCreator.create(contentValues);
+    }
+
+    private void setErrorFields() {
+        if (errorEmptyUsername)
+            tilUsername.setError(getResources().getString(R.string.snackbar_fail_empty_username));
+        else
+            tilUsername.setError(null);
+
+        if (errorEmptyPassword)
+            tilPassword.setError(getResources().getString(R.string.snackbar_fail_empty_password));
+        else
+            tilPassword.setError(null);
+
+        if (errorInvalidLogin)
+            tilUsername.setError(getResources().getString(R.string.snackbar_fail_login_invalid));
+
+        if (errorVerificationRequired)
+            tilUsername.setError(getResources().getString(R.string.snackbar_fail_login_unverified));
     }
 }

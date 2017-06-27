@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -24,7 +25,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.widget.NumberPicker;
 
 import com.arnesfield.school.finder.tasks.CheckForNotifsTask;
 import com.arnesfield.school.finder.tasks.LogoutUserTask;
@@ -53,6 +54,11 @@ public class MainActivity extends AppCompatActivity implements
         DialogCreator.DialogActionListener, UpdateLocationTask.OnUpdateLocationListener,
         LogoutUserTask.OnLogoutListener, SendNotifsTask.OnSendNotifsListener,
         CheckForNotifsTask.OnCheckForNotifsListener {
+
+    private static int currDistanceVal = 0;
+    private static int currTempDistanceVal = 0;
+    private static final String DISTANCE_PREF = "distance_pref";
+    private static final String DISTANCE_ID = "distance_id";
 
     private GoogleMap mMap;
     private LocationManager locationManager;
@@ -93,6 +99,15 @@ public class MainActivity extends AppCompatActivity implements
 
             // remove message
             getIntent().putExtra("show_message", false);
+        }
+
+        // get curr distance from shared pref
+        SharedPreferences sharedPreferences = getSharedPreferences(DISTANCE_PREF, MODE_PRIVATE);
+        int distance = sharedPreferences.getInt(DISTANCE_ID, 2);
+
+        // init
+        if (currDistanceVal <= 0) {
+            currDistanceVal = distance;
         }
 
         fabGps = (FloatingActionButton) findViewById(R.id.main_fab_gps);
@@ -252,7 +267,29 @@ public class MainActivity extends AppCompatActivity implements
 
         // add markers based from list of users
         if (!UserLocation.isListEmpty()) {
+
             for (UserLocation u : UserLocation.getCopyOfList()) {
+
+                if (currLocation != null) {
+                    Location userLoc = new Location(u.getUsername());
+
+                    userLoc.setLatitude(u.getLatitude());
+                    userLoc.setLongitude(u.getLongitude());
+
+                    float distanceMeters = currLocation.distanceTo(userLoc);
+                    int targetKilometers = currDistanceVal;
+
+                    // meters to km
+                    float distance = distanceMeters / 1000;
+
+                    // if distance is greater than target km
+                    if (distance > targetKilometers) {
+                        // remove user
+                        UserLocation.removeLocation(u);
+                        continue;
+                    }
+                }
+
                 // add all markers
                 mMap.addMarker(new MarkerOptions()
                         .title(u.getUsername())
@@ -385,8 +422,16 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_logout:
+            case R.id.action_menu_logout:
                 triggerLogout();
+                return true;
+            case R.id.action_menu_set_distance:
+                DialogCreator.create(this, "distance")
+                        .setTitle(R.string.dialog_distance_title)
+                        .setView(R.layout.dialog_picker)
+                        .setPositiveButton(R.string.dialog_distance_positive)
+                        .setNegativeButton(R.string.dialog_distance_negative)
+                        .show();
                 return true;
         }
 
@@ -453,12 +498,29 @@ public class MainActivity extends AppCompatActivity implements
             case "notify":
                 SendNotifsTask.execute(this);
                 break;
+
+            case "distance":
+                currDistanceVal = currTempDistanceVal;
+
+                // save val to shared pref
+                SharedPreferences sharedPreferences = getSharedPreferences(DISTANCE_PREF, MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt(DISTANCE_ID, currDistanceVal);
+                editor.apply();
+
+                SnackBarCreator.set("Fetching users within " + currDistanceVal + "km radius.");
+                SnackBarCreator.show(rootView, true);
+                break;
         }
     }
 
     @Override
     public void onClickNegativeButton(String actionId) {
-
+        switch (actionId) {
+            case "distance":
+                currTempDistanceVal = currDistanceVal;
+                break;
+        }
     }
 
     @Override
@@ -473,7 +535,19 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onCreateDialogView(String actionId, View view) {
+        NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.dialog_distance_picker);
+        numberPicker.setMinValue(1);
+        numberPicker.setMaxValue(30);
 
+        currTempDistanceVal = currDistanceVal;
+        numberPicker.setValue(currDistanceVal);
+
+        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                currTempDistanceVal = newVal;
+            }
+        });
     }
 
     // add location task listener
@@ -512,7 +586,8 @@ public class MainActivity extends AppCompatActivity implements
     // notifs send
     @Override
     public void onSentNotif() {
-        Toast.makeText(this, R.string.snackbar_success_notifs_sent, Toast.LENGTH_SHORT).show();
+        SnackBarCreator.set(R.string.snackbar_success_notifs_sent);
+        SnackBarCreator.show(rootView, true);
     }
 
     @Override

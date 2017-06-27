@@ -29,7 +29,6 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.On
     private EditText etPassword;
     private Button btnLogin;
     private TextView tvCreateAccount;
-    private TextView tvForgotPassword;
     private View rootView;
     private TextInputLayout tilUsername;
     private TextInputLayout tilPassword;
@@ -56,7 +55,6 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.On
         etPassword = (EditText) findViewById(R.id.login_et_password);
 
         tvCreateAccount = (TextView) findViewById(R.id.tv_create_account);
-        tvForgotPassword = (TextView) findViewById(R.id.tv_forgot_password);
 
         btnLogin = (Button) findViewById(R.id.login_btn_login);
 
@@ -65,13 +63,6 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.On
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
                 startActivity(intent);
-            }
-        });
-
-        tvForgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
             }
         });
 

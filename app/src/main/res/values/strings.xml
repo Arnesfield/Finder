@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Finder</string>
 
-    <string name="action_logout">Logout</string>
+    <string name="action_menu_logout">Logout</string>
+    <string name="action_menu_set_distance">Set Distance</string>
 
     <string name="title_activity_maps">Finder</string>
     <string name="title_activity_login">Login</string>
@@ -29,6 +30,10 @@
     <string name="dialog_logout_msg">You will be logged out. Continue logout?</string>
     <string name="dialog_logout_positive">Logout</string>
     <string name="dialog_logout_negative">Cancel</string>
+
+    <string name="dialog_distance_title">Set Distance</string>
+    <string name="dialog_distance_positive">Set</string>
+    <string name="dialog_distance_negative">Cancel</string>
 
     <string name="progress_login_title">Logging In</string>
     <string name="progress_login_msg">Loading login information...</string>

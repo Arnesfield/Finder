@@ -37,6 +37,10 @@ public final class UserLocation {
         return userLocation;
     }
 
+    public static void removeLocation(UserLocation u) {
+        LIST_OF_USER_LOCATIONS.remove(u);
+    }
+
     public static boolean isListEmpty() {
         return LIST_OF_USER_LOCATIONS.isEmpty();
     }

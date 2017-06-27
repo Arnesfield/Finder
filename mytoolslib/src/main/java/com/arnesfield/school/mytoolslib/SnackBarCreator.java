@@ -32,4 +32,16 @@ public final class SnackBarCreator {
         message = null;
         resId = -1;
     }
+
+    public static void show(View view, boolean lengthLong) {
+        try {
+            if (!(message.isEmpty() || message.matches("[\\s]+")))
+                Snackbar.make(view, message, (lengthLong ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT)).show();
+        } catch (Exception e) {}
+        try{
+            Snackbar.make(view, resId, (lengthLong ? Snackbar.LENGTH_LONG : Snackbar.LENGTH_SHORT)).show();
+        } catch (Exception e) {}
+        message = null;
+        resId = -1;
+    }
 }

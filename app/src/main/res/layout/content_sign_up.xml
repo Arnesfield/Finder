@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.arnesfield.school.finder.SignUpActivity"
-    tools:showIn="@layout/activity_sign_up"
-    android:id="@+id/signup_root_view">
+    tools:showIn="@layout/activity_sign_up">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/signup_form_container"

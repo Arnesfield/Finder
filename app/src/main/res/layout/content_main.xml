@@ -7,8 +7,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main"
-    tools:context="com.arnesfield.school.finder.MainActivity"
-    android:id="@+id/main_root_view">
+    tools:context="com.arnesfield.school.finder.MainActivity">
 
     <include
         android:id="@+id/main_map_wrapper"

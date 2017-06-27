@@ -83,7 +83,9 @@ public final class LogoutUserTask extends AsyncTask<Void, Void, Integer> {
     @Override
     protected void onPostExecute(Integer integer) {
         super.onPostExecute(integer);
-        if (doPostExecute)
+        if (doPostExecute) {
+            progressDialog.dismiss();
             ((OnLogoutListener)context).onLoggedOut();
+        }
     }
 }

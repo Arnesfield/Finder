@@ -33,6 +33,9 @@
     <string name="progress_login_title">Logging In</string>
     <string name="progress_login_msg">Loading login information...</string>
 
+    <string name="progress_logout_title">Logging Out</string>
+    <string name="progress_logout_msg">Logging out user...</string>
+
     <string name="progress_signup_title">Signing Up</string>
     <string name="progress_signup_msg">Creating your account...</string>
 

@@ -343,21 +343,21 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         // logout task or offline
-        LogoutUserTask.execute(this);
+        LogoutUserTask.execute(this, false);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         // logout task or offline
-        LogoutUserTask.execute(this);
+        LogoutUserTask.execute(this, false);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         // logout task or offline
-        LogoutUserTask.execute(this);
+        LogoutUserTask.execute(this, false);
     }
 
     @Override
@@ -442,10 +442,7 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent;
         switch (actionId) {
             case "logout":
-                intent = new Intent(this, LoginActivity.class);
-                intent.putExtra("logout", 1);
-                startActivity(intent);
-                finish();
+                LogoutUserTask.execute(this, true);
                 break;
 
             case "request":
@@ -497,6 +494,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     // logout listener
+    @Override
+    public void onLoggedOut() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("logout", 1);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     public String createLogoutPostString(ContentValues contentValues) throws UnsupportedEncodingException {
         contentValues.put("uid", uid);

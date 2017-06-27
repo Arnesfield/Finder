@@ -5,10 +5,10 @@ package com.arnesfield.school.finder.config;
  */
 
 public final class TaskConfig {
-    public static final String HTTP_HOST = "http://192.168.1.10/";
-    public static final String DIR_URL = "sites/school/android/finder/web/";
-    // public static final String HTTP_HOST = "http://arnesfield.pe.hu/";
-    // public static final String DIR_URL = "android/";
+    // public static final String HTTP_HOST = "http://192.168.1.10/";
+    // public static final String DIR_URL = "sites/school/android/finder/web/";
+    public static final String HTTP_HOST = "http://arnesfield.pe.hu/";
+    public static final String DIR_URL = "android/";
     public static final String DIR_ACTION_URL = DIR_URL + "action/";
     public static final String FETCH_URL = HTTP_HOST + DIR_ACTION_URL + "get-location.php";
     public static final String UPDATE_LOCATION_URL = HTTP_HOST + DIR_ACTION_URL + "update-location.php";

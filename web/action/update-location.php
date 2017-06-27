@@ -9,6 +9,15 @@ if (isset($_POST['location']) && isset($_POST['uid'])) {
 
   $sql = "
     UPDATE locations
+    SET status = '0'
+  ";
+
+  $stmt = $conn->prepare($sql);
+  $stmt->execute();
+  $stmt->close();
+  
+  $sql = "
+    UPDATE locations
     SET
       latitude = ?,
       longitude = ?,

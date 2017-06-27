@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements
         if (arePermissionsAllowed()) {
             // SnackBarCreator.set("Requestion for location updates.");
             // change provider
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, locationListener);
         }
         else {
             SnackBarCreator.set(R.string.snackbar_permission_denied);

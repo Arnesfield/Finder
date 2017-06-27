@@ -11,7 +11,7 @@ if (isset($_POST['location']) && isset($_POST['uid'])) {
     UPDATE locations
     SET status = '0'
     WHERE
-      (date_time + INTERVAL 3 MINUTE) > date_time
+      (date_time + INTERVAL 1 MINUTE) < date_time
   ";
 
   $stmt = $conn->prepare($sql);

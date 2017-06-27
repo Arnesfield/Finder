@@ -1,6 +1,4 @@
 <?php
-$_POST['check-notif'] = '';
-$_POST['uid'] = 1;
 if (isset($_POST['check-notif']) && isset($_POST['uid'])) {
   require_once('header.php');
   require_once('db-connection.php');

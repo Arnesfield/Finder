@@ -4,7 +4,7 @@ if (isset($_POST['notify']) && isset($_POST['uid']) && !empty($_POST['send_to'])
   require_once('db-connection.php');
 
   $uid_from = input_filter($_POST['uid']);
-  $sent_to = explode(',', input_filter($_POST['send_to']));
+  $send_to = explode(',', input_filter($_POST['send_to']));
 
   $sql = "
     INSERT INTO notifications(

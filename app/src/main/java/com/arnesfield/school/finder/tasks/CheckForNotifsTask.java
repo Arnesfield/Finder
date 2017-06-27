@@ -21,30 +21,31 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by User on 06/07.
+ * Created by User on 06/25.
  */
 
-public final class FetchLocationTask extends AsyncTask<String, Integer, String> {
+public final class CheckForNotifsTask extends AsyncTask<Void, Void, String> {
 
     public static void execute(Context context) {
-        new FetchLocationTask(context).execute();
+        new CheckForNotifsTask(context).execute();
     }
 
-    public interface OnPostExecuteListener {
-        void parseJSONString(String jsonString);
-        String createUserIdPostString(ContentValues contentValues) throws UnsupportedEncodingException;
+    public interface OnCheckForNotifsListener {
+        void parseCheckNotifsJSONString(String jsonString);
+        String createCheckNotifsPostString(ContentValues contentValues) throws UnsupportedEncodingException;
     }
 
     private final Context context;
 
-    private FetchLocationTask(Context context) {
+    public CheckForNotifsTask(Context context) {
         this.context = context;
     }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected String doInBackground(Void... params) {
         try {
-            URL url = new URL(TaskConfig.FETCH_URL);
+            // set form information
+            URL url = new URL(TaskConfig.CHECK_FOR_NOTIFS_URL);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
             httpURLConnection.setRequestMethod("POST");
@@ -54,7 +55,7 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
             OutputStream outputStream = new BufferedOutputStream(httpURLConnection.getOutputStream());
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
 
-            String postString = ((OnPostExecuteListener)context).createUserIdPostString(new ContentValues());
+            String postString = ((OnCheckForNotifsListener)context).createCheckNotifsPostString(new ContentValues());
             bufferedWriter.write(postString);
 
             // clear
@@ -64,6 +65,7 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
 
             InputStream inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
             StringBuilder stringBuilder = new StringBuilder();
             String line = "";
 
@@ -77,8 +79,7 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
             httpURLConnection.disconnect();
 
             return stringBuilder.toString();
-        } catch (Exception ignored) {}
-
+        } catch (Exception e) {}
         return null;
     }
 
@@ -87,11 +88,12 @@ public final class FetchLocationTask extends AsyncTask<String, Integer, String> 
         super.onPreExecute();
     }
 
+
     @Override
     protected void onPostExecute(String jsonString) {
         super.onPostExecute(jsonString);
         try {
-            ((OnPostExecuteListener)context).parseJSONString(jsonString);
+            ((OnCheckForNotifsListener)context).parseCheckNotifsJSONString(jsonString);
         } catch (Exception e) {}
     }
 }

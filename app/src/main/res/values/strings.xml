@@ -20,6 +20,11 @@
     <string name="dialog_request_msg">Turn on your location settings to be able to get location data.</string>
     <string name="dialog_request_positive">Go to Settings</string>
 
+    <string name="dialog_notify_title">Send Request</string>
+    <string name="dialog_notify_msg">Request for assistance from nearby users?</string>
+    <string name="dialog_notify_positive">Request</string>
+    <string name="dialog_notify_negative">Cancel</string>
+
     <string name="dialog_logout_title">Logout</string>
     <string name="dialog_logout_msg">You will be logged out. Continue logout?</string>
     <string name="dialog_logout_positive">Logout</string>
@@ -34,6 +39,9 @@
     <string name="progress_fetch_location_title">Loading</string>
     <string name="progress_fetch_location_msg">Loading location data...</string>
 
+    <string name="progress_notifs_send_title">Requesting</string>
+    <string name="progress_notifs_send_msg">Requesting for assistance...</string>
+
     <string name="snackbar_permission_denied">Could not request for location updates.</string>
 
     <string name="snackbar_success_login">Logged in successfully.</string>
@@ -41,6 +49,8 @@
 
     <string name="snackbar_success_signup">Account created successfully.</string>
     <string name="snackbar_success_signup_verify_msg">An email has been sent to verify your account.</string>
+
+    <string name="snackbar_success_notifs_sent">Requests successfully sent.</string>
 
     <string name="snackbar_fail_login_invalid">Invalid username or password.</string>
     <string name="snackbar_fail_login_unverified">Please verify your account first.</string>
@@ -55,4 +65,7 @@
     <string name="snackbar_fail_signup_unable">Unable to create your account.</string>
     <string name="snackbar_fail_signup_duplicate_username">Username already taken.</string>
     <string name="snackbar_fail_signup_duplicate_email">Email is already being used.</string>
+
+    <string name="notification_title">is near you</string>
+    <string name="notification_msg">Someone near you is in need of assistance.</string>
 </resources>

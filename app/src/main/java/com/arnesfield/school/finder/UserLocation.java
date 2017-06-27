@@ -1,5 +1,7 @@
 package com.arnesfield.school.finder;
 
+import android.text.TextUtils;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -11,9 +13,17 @@ import java.util.ArrayList;
 public final class UserLocation {
     // list of user locations
     private static final ArrayList<UserLocation> LIST_OF_USER_LOCATIONS = new ArrayList<>();
+    public static final ArrayList<String> LIST_OF_NOTIFS = new ArrayList<>();
 
     public static ArrayList<UserLocation> getCopyOfList() {
         return new ArrayList<>(LIST_OF_USER_LOCATIONS);
+    }
+
+    public static String createStringOfIdsFromList() {
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (UserLocation u : LIST_OF_USER_LOCATIONS)
+            arrayList.add(u.getId());
+        return TextUtils.join(",", arrayList);
     }
 
     // clear list
@@ -21,8 +31,8 @@ public final class UserLocation {
         LIST_OF_USER_LOCATIONS.clear();
     }
 
-    public static UserLocation addLocation(String username, double latitude, double longitude, String dateTime) {
-        UserLocation userLocation = new UserLocation(username, latitude, longitude, dateTime);
+    public static UserLocation addLocation(String id, String username, double latitude, double longitude, String dateTime) {
+        UserLocation userLocation = new UserLocation(id, username, latitude, longitude, dateTime);
         LIST_OF_USER_LOCATIONS.add(userLocation);
         return userLocation;
     }
@@ -32,15 +42,20 @@ public final class UserLocation {
     }
 
     // instance
-    private String username, dateTime;
+    private String id, username, dateTime;
     private double latitude, longitude;
 
     // constructor
-    private UserLocation(String username, double latitude, double longitude, String dateTime) {
+    private UserLocation(String id, String username, double latitude, double longitude, String dateTime) {
+        this.id = id;
         this.username = username;
         this.latitude = latitude;
         this.longitude = longitude;
         this.dateTime = dateTime;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getUsername() {

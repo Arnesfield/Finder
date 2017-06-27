@@ -134,7 +134,7 @@ public class SignUpActivity extends AppCompatActivity implements SignUpUserTask.
         }
         else if (resultCode == 1) {
             Toast.makeText(this, R.string.snackbar_success_signup, Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, R.string.snackbar_success_signup_verify_msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.snackbar_success_signup_verify_msg, Toast.LENGTH_LONG).show();
             finish();
         }
         else {

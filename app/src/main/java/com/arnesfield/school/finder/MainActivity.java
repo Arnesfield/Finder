@@ -1,6 +1,8 @@
 package com.arnesfield.school.finder;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -14,15 +16,19 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.arnesfield.school.finder.tasks.CheckForNotifsTask;
 import com.arnesfield.school.finder.tasks.LogoutUserTask;
+import com.arnesfield.school.finder.tasks.SendNotifsTask;
 import com.arnesfield.school.finder.tasks.UpdateLocationTask;
 import com.arnesfield.school.finder.tasks.FetchLocationTask;
 import com.arnesfield.school.mytoolslib.DialogCreator;
@@ -45,12 +51,14 @@ import java.io.UnsupportedEncodingException;
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, FetchLocationTask.OnPostExecuteListener,
         DialogCreator.DialogActionListener, UpdateLocationTask.OnUpdateLocationListener,
-        LogoutUserTask.OnLogoutListener {
+        LogoutUserTask.OnLogoutListener, SendNotifsTask.OnSendNotifsListener,
+        CheckForNotifsTask.OnCheckForNotifsListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private FloatingActionButton fab;
+    private FloatingActionButton fabGps;
+    private FloatingActionButton fabSend;
     private boolean isMapReady;
     private Location currLocation;
     private boolean wasPressed;
@@ -87,7 +95,8 @@ public class MainActivity extends AppCompatActivity implements
             getIntent().putExtra("show_message", false);
         }
 
-        fab = (FloatingActionButton) findViewById(R.id.main_fab);
+        fabGps = (FloatingActionButton) findViewById(R.id.main_fab_gps);
+        fabSend = (FloatingActionButton) findViewById(R.id.main_fab_send);
 
         isMapReady = false;
         wasPressed = false;
@@ -95,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                fabGps.setImageResource(R.drawable.ic_my_location_black_24dp);
                 // when location updates
                 whenLocationChanges(location, wasPressed);
             }
@@ -111,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onProviderDisabled(String provider) {
+                fabGps.setImageResource(R.drawable.ic_location_disabled_black_24dp);
                 DialogCreator.create(MainActivity.this, "request")
                         .setTitle(R.string.dialog_request_title)
                         .setMessage(R.string.dialog_request_msg)
@@ -129,15 +140,58 @@ public class MainActivity extends AppCompatActivity implements
             whenPermissionIsSet();
     }
 
+    private void triggerNotification(String username) {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_location_on_white_24dp)
+                        .setContentTitle(username + " " + getResources().getString(R.string.notification_title))
+                        .setContentText(getResources().getString(R.string.notification_msg));
+
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, LoginActivity.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(LoginActivity.class);
+
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
+    }
+
     private void whenPermissionIsSet() {
         // enable buttons and functionality
-        fab.setOnClickListener(new View.OnClickListener() {
+        fabGps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 gotoCurrentLocation();
             }
         });
 
+        fabSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // send notifications
+                DialogCreator.create(MainActivity.this, "notify")
+                        .setTitle(R.string.dialog_notify_title)
+                        .setMessage(R.string.dialog_notify_msg)
+                        .setPositiveButton(R.string.dialog_notify_positive)
+                        .setNegativeButton(R.string.dialog_notify_negative)
+                        .show();
+            }
+        });
     }
 
     private void gotoCurrentLocation() {
@@ -183,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements
         // add current location
         UpdateLocationTask.execute(this);
 
-        // only go to current position when fab is pressed
+        // only go to current position when fabGps is pressed
         wasPressed = isPressed;
 
         // if param location is null, set to instance current location
@@ -207,8 +261,26 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
+        // notify here
+        if (!UserLocation.LIST_OF_NOTIFS.isEmpty()) {
+            for (String username : UserLocation.LIST_OF_NOTIFS)
+                triggerNotification(username);
+        }
+
+        // clear notifs
+        UserLocation.LIST_OF_NOTIFS.clear();
+
+
+        // fetch locations
+        FetchLocationTask.execute(this);
+
+        // check for notifs
+        CheckForNotifsTask.execute(this);
+
+
+        // DO ONLY ON CLICK FAB
         // if param location is still null
-        // or if fab was not pressed
+        // or if fabGps was not pressed
         if (currLocation == null || !wasPressed)
             return;
 
@@ -240,9 +312,6 @@ public class MainActivity extends AppCompatActivity implements
                 .build();
 
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-        // fetch locations
-        FetchLocationTask.execute(this);
     }
 
     private void triggerLogout() {
@@ -254,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements
                 .show();
     }
 
+    /*
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -261,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         return super.onKeyDown(keyCode, event);
     }
+    */
 
     @Override
     protected void onDestroy() {
@@ -271,7 +342,21 @@ public class MainActivity extends AppCompatActivity implements
             locationManager.removeUpdates(locationListener);
         }
 
-        // logout task
+        // logout task or offline
+        LogoutUserTask.execute(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // logout task or offline
+        LogoutUserTask.execute(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // logout task or offline
         LogoutUserTask.execute(this);
     }
 
@@ -290,8 +375,6 @@ public class MainActivity extends AppCompatActivity implements
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -333,6 +416,7 @@ public class MainActivity extends AppCompatActivity implements
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
 
+                String id = jsonObject.getString("id");
                 String username = jsonObject.getString("username");
                 double latitude = jsonObject.getDouble("latitude");
                 double longitude = jsonObject.getDouble("longitude");
@@ -340,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements
                 String dateTime = jsonObject.getString("date_time");
 
                 // add user locations to list
-                UserLocation.addLocation(username, latitude, longitude, dateTime);
+                UserLocation.addLocation(id, username, latitude, longitude, dateTime);
             }
         } catch (JSONException ignored) {}
     }
@@ -367,6 +451,10 @@ public class MainActivity extends AppCompatActivity implements
             case "request":
                 intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
+                break;
+
+            case "notify":
+                SendNotifsTask.execute(this);
                 break;
         }
     }
@@ -413,6 +501,49 @@ public class MainActivity extends AppCompatActivity implements
     public String createLogoutPostString(ContentValues contentValues) throws UnsupportedEncodingException {
         contentValues.put("uid", uid);
         contentValues.put("logout", true);
+        return RequestStringCreator.create(contentValues);
+    }
+
+    // notifs send
+    @Override
+    public void onSentNotif() {
+        Toast.makeText(this, R.string.snackbar_success_notifs_sent, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public String createNotifsPostString(ContentValues contentValues) throws UnsupportedEncodingException {
+        contentValues.put("uid", uid);
+        contentValues.put("notify", true);
+        contentValues.put("send_to", UserLocation.createStringOfIdsFromList());
+        return RequestStringCreator.create(contentValues);
+    }
+
+    // check for notifs
+    @Override
+    public void parseCheckNotifsJSONString(String jsonString) {
+        // clear user list
+        UserLocation.LIST_OF_NOTIFS.clear();
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            JSONArray jsonArray = jsonObject.getJSONArray("notifs");
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                jsonObject = jsonArray.getJSONObject(i);
+
+                String id = jsonObject.getString("id");
+                String username = jsonObject.getString("username");
+
+                // send notif
+                UserLocation.LIST_OF_NOTIFS.add(username);
+            }
+        } catch (JSONException ignored) {}
+    }
+
+    @Override
+    public String createCheckNotifsPostString(ContentValues contentValues) throws UnsupportedEncodingException {
+        contentValues.put("uid", uid);
+        contentValues.put("check-notif", true);
         return RequestStringCreator.create(contentValues);
     }
 }

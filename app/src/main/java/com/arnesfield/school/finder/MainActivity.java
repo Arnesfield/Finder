@@ -40,6 +40,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -360,6 +362,23 @@ public class MainActivity extends AppCompatActivity implements
                 .show();
     }
 
+    private int getZoomLevel(int radius) {
+        CircleOptions circleOptions = new CircleOptions()
+                .center(new LatLng(currLocation.getLatitude(), currLocation.getLongitude()))
+                .radius(radius * 1000);
+
+        Circle circle = mMap.addCircle(circleOptions);
+        mMap.clear();
+
+        if (circle != null){
+            double rad = circle.getRadius();
+            double scale = rad / 500;
+            return (int) (16 - Math.log(scale) / Math.log(2));
+        }
+
+        return 17;
+    }
+
     /*
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -507,6 +526,26 @@ public class MainActivity extends AppCompatActivity implements
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt(DISTANCE_ID, currDistanceVal);
                 editor.apply();
+
+                // zoom out or in
+                if (isMapReady) {
+                    try {
+                        // Add my current location
+                        double latitude = currLocation.getLatitude();
+                        double longitude = currLocation.getLongitude();
+
+                        LatLng coordinates = new LatLng(latitude, longitude);
+                        // animate to position
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(coordinates)
+                                .zoom(getZoomLevel(currDistanceVal))
+                                // .bearing(0)
+                                // .tilt(30)
+                                .build();
+
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    } catch (Exception e) {}
+                }
 
                 SnackBarCreator.set("Fetching users within " + currDistanceVal + "km radius.");
                 SnackBarCreator.show(rootView, true);

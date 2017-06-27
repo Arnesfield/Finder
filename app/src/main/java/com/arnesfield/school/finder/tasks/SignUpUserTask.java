@@ -100,6 +100,8 @@ public final class SignUpUserTask extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String jsonString) {
         super.onPostExecute(jsonString);
         progressDialog.dismiss();
-        ((OnSignUpListener)context).parseJSONString(jsonString);
+        try {
+            ((OnSignUpListener)context).parseJSONString(jsonString);
+        } catch (Exception e) {}
     }
 }

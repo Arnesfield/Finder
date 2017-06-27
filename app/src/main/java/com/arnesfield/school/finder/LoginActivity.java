@@ -149,6 +149,13 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.On
         return RequestStringCreator.create(contentValues);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        tilUsername.setError(null);
+        tilPassword.setError(null);
+    }
+
     private void setErrorFields() {
         if (errorEmptyUsername)
             tilUsername.setError(getResources().getString(R.string.snackbar_fail_empty_username));
@@ -160,8 +167,10 @@ public class LoginActivity extends AppCompatActivity implements LoginUserTask.On
         else
             tilPassword.setError(null);
 
-        if (errorInvalidLogin)
+        if (errorInvalidLogin) {
             tilUsername.setError(getResources().getString(R.string.snackbar_fail_login_invalid));
+            tilPassword.setError(getResources().getString(R.string.snackbar_fail_login_invalid));
+        }
 
         if (errorVerificationRequired)
             tilUsername.setError(getResources().getString(R.string.snackbar_fail_login_unverified));

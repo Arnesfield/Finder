@@ -61,7 +61,7 @@
     <string name="snackbar_success_notifs_sent">Requests successfully sent.</string>
 
     <string name="snackbar_fail_login_invalid">Invalid username or password.</string>
-    <string name="snackbar_fail_login_unverified">Please verify your account first.</string>
+    <string name="snackbar_fail_login_unverified">Please verify your email account first.</string>
 
     <string name="snackbar_fail_empty_field">Field cannot be blank.</string>
     <string name="snackbar_fail_empty_username">Username cannot be blank.</string>

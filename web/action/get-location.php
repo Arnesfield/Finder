@@ -7,6 +7,7 @@ if (isset($_POST['fetch']) && isset($_POST['uid'])) {
 
   $sql = "
     SELECT
+      u.id AS 'id',
       u.username AS 'username',
       l.latitude AS 'latitude',
       l.longitude AS 'longitude',
@@ -24,10 +25,11 @@ if (isset($_POST['fetch']) && isset($_POST['uid'])) {
   $array['locations'] = array();
   while ($row = mysqli_fetch_array($result)) {
     array_push($array['locations'], array(
-      'username' => $row[0],
-      'latitude' => $row[1],
-      'longitude' => $row[2],
-      'date_time' => $row[3]
+      'id' => $row[0],
+      'username' => $row[1],
+      'latitude' => $row[2],
+      'longitude' => $row[3],
+      'date_time' => $row[4]
     ));
   }
 

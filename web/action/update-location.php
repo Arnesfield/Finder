@@ -24,4 +24,8 @@ if (isset($_POST['location']) && isset($_POST['uid'])) {
 
   $conn->close();
 }
+else {
+  // redirect
+  header('location: ./');
+}
 ?>
